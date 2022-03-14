@@ -101,7 +101,7 @@ int main(int argc, char * argv[]) try
         struct My_udp_data my_udp_data;
         my_udp_data.obstacle_rate = 0;
         my_udp_data.obstacle_rate = remove_background(other_frame, aligned_depth_frame, depth_scale, depth_clipping_distance);
-        printf("%lf\r", my_udp_data.obstacle_rate);
+        printf("%lf\n", my_udp_data.obstacle_rate);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
         // // Taking dimensions of the window for rendering purposes
