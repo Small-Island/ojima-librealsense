@@ -209,7 +209,7 @@ double remove_background(rs2::video_frame& other_frame, const rs2::depth_frame& 
     int sum = 0;
 
     #pragma omp parallel for schedule(dynamic) //Using OpenMP to try to parallelise the loop
-    for (int y = 0; y < height*0.7; y++)
+    for (int y = 0; y < height*0.8; y++)
     {
         auto depth_pixel_index = y * width;
         for (int x = 0; x < width; x++, ++depth_pixel_index)
