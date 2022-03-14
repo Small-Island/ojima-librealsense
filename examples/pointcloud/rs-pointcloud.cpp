@@ -46,6 +46,15 @@ int main(int argc, char * argv[]) try
 
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
+        auto vertices = points.get_vertices();
+        printf("%d\n", points.size());
+        int sum = 0;
+        for (int i = 0; i < points.size(); i++) {
+            if (vertices[i].z > 0) {
+                sum++;
+            }
+        }
+        printf("%d\n", sum);
 
         // Upload the color frame to OpenGL
         app_state.tex.upload(color);
