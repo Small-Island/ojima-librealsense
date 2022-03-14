@@ -95,7 +95,7 @@ struct rect
 
 struct tile_properties
 {
-   
+
     unsigned int x, y; //location of tile in the grid
     unsigned int w, h; //width and height by number of tiles
     Priority priority; //when should the tile be drawn?: high priority is on top of all, medium is a layer under top layer, low is a layer under medium layer
@@ -709,7 +709,7 @@ public:
     }
 
     //gets as argument a map of the -need to be drawn- frames with their tiles properties,
-    //which indicates where and what size should the frame be drawn on the canvas 
+    //which indicates where and what size should the frame be drawn on the canvas
     void show(const frames_mosaic& frames)
     {
         // Render openGl mosaic of frames
@@ -748,11 +748,11 @@ public:
     // There may be several windows displayed on the sceen, as described in the frames_mosaic structure.
     // The windows are displayed in a reduced resolution, appropriate the amount of space allocated for them on the screen.
     // This function converts from screen pixel to original image pixel.
-    // 
+    //
     // Input:
     // pos - pixel in screen coordinates.
     // frames - structure of separate windows displayed on screen.
-    // Returns: 
+    // Returns:
     // The index of the window the screen pixel is in and the pixel in that window in the original window's resolution.
     frame_pixel get_pos_on_current_image(float2 pos, const frames_mosaic& frames)
     {
@@ -980,7 +980,7 @@ void draw_pointcloud(float width, float height, glfw_state& app_state, rs2::poin
     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
     for (int i = 0; i < points.size(); i++)
     {
-        if (vertices[i].z)
+        if (vertices[i].z > 0 && vertices[i].y > 0)
         {
             // upload the point and texture coordinates only for points we have depth data for
             glVertex3fv(vertices[i]);
