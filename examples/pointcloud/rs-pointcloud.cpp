@@ -136,7 +136,7 @@ int main(int argc, char * argv[]) try
         // Tell pointcloud object to map to this color frame
         // pc.map_to(color);
 
-        // auto depth = frames.get_depth_frame();
+        auto depth = frames.get_depth_frame();
 
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
