@@ -167,7 +167,7 @@ int main(int argc, char * argv[]) try
 
         struct My_udp_data my_udp_data;
 
-        if (sum > 500) {
+        if (sum > 100) {
             my_udp_data.obstacle_rate = 1;
         }
         else {
