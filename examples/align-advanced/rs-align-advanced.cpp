@@ -36,8 +36,8 @@ int main(int argc, char * argv[]) try
     addr.sin_port = htons(4001);
 
     // Create and initialize GUI related objects
-    // window app(1280, 720, "RealSense Align (Advanced) Example"); // Simple window handling
-    // ImGui_ImplGlfw_Init(app, false);      // ImGui library intializition
+    window app(1280, 720, "RealSense Align (Advanced) Example"); // Simple window handling
+    ImGui_ImplGlfw_Init(app, false);      // ImGui library intializition
     rs2::colorizer c;                     // Helper to colorize depth images
     texture renderer;                     // Helper for renderig images
 
