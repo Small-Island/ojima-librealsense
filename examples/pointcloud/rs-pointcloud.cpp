@@ -56,7 +56,7 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
         //     glVertex3fv(vertices[i]);
         //     glTexCoord2fv(tex_coords[i]);
         // }
-        if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.65)
+        if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.6)
         {
             // upload the point and texture coordinates only for points we have depth data for
             glVertex3fv(vertices[i]);
