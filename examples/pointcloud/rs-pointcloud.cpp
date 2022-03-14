@@ -6,6 +6,16 @@
 
 #include <algorithm>            // std::min, std::max
 
+#include <arpa/inet.h>
+#include <unistd.h>
+
+int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+struct sockaddr_in addr;
+
+struct My_udp_data {
+    double obstacle_rate = 0.0;
+};
+
 // Helper functions
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
@@ -48,6 +58,7 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     /* this segment actually prints the pointcloud */
     auto vertices = points.get_vertices();              // get vertices
     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
+    int sum = 0
     for (int i = 0; i < points.size(); i++)
     {
         // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -58,11 +69,26 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
         // }
         if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.55 && vertices[i].z < 1.0)
         {
-            // upload the point and texture coordinates only for points we have depth data for
-            glVertex3fv(vertices[i]);
-            glTexCoord2fv(tex_coords[i]);
+            if (vertices[i].z < 1.0) {
+                // upload the point and texture coordinates only for points we have depth data for
+                glVertex3fv(vertices[i]);
+                glTexCoord2fv(tex_coords[i]);
+                sum++;
+            }
         }
     }
+
+    printf("sum: %d\n", sum);
+
+    struct My_udp_data my_udp_data;
+
+    if (sum > 500) {
+        my_udp_data.obstacle_rate = 1;
+    }
+    else {
+        my_udp_data.obstacle_rate = 0;
+    }
+    sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
     // OpenGL cleanup
     glEnd();
@@ -74,6 +100,10 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
 
 int main(int argc, char * argv[]) try
 {
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addr.sin_port = htons(4001);
+
     // Create a simple OpenGL window for rendering:
     window app(1280, 720, "RealSense Pointcloud Example");
     // Construct an object to manage view state
