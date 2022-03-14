@@ -105,11 +105,11 @@ int main(int argc, char * argv[]) try
     addr.sin_port = htons(4001);
 
     // Create a simple OpenGL window for rendering:
-    window app(1280, 720, "RealSense Pointcloud Example");
+    // window app(1280, 720, "RealSense Pointcloud Example");
     // Construct an object to manage view state
-    glfw_state app_state;
+    // glfw_state app_state;
     // register callbacks to allow manipulation of the pointcloud
-    register_glfw_callbacks(app, app_state);
+    // register_glfw_callbacks(app, app_state);
 
     // Declare pointcloud object, for calculating pointclouds and texture mappings
     rs2::pointcloud pc;
@@ -121,38 +121,66 @@ int main(int argc, char * argv[]) try
     // Start streaming with default recommended configuration
     pipe.start();
 
-    while (app) // Application still alive?
+    // while (app) // Application still alive?
+    while (1)
     {
         // Wait for the next set of frames from the camera
         auto frames = pipe.wait_for_frames();
 
-        auto color = frames.get_color_frame();
+        // auto color = frames.get_color_frame();
 
         // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
-        if (!color)
-            color = frames.get_infrared_frame();
+        // if (!color)
+        //     color = frames.get_infrared_frame();
 
         // Tell pointcloud object to map to this color frame
-        pc.map_to(color);
+        // pc.map_to(color);
 
-        auto depth = frames.get_depth_frame();
+        // auto depth = frames.get_depth_frame();
 
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
+
         int sum = 0;
-        for (int i = 0; i < points.size(); i++) {
-            if (vertices[i].y > 0 && 0 < vertices[i].z && vertices[i].z < 1.0) {
-                sum++;
+        for (int i = 0; i < points.size(); i++)
+        {
+            // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
+            // {
+            //     // upload the point and texture coordinates only for points we have depth data for
+            //     glVertex3fv(vertices[i]);
+            //     glTexCoord2fv(tex_coords[i]);
+            // }
+            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.55 && vertices[i].z < 1.0)
+            {
+                if (vertices[i].z < 1.0) {
+                    // upload the point and texture coordinates only for points we have depth data for
+                    // glVertex3fv(vertices[i]);
+                    // glTexCoord2fv(tex_coords[i]);
+                    sum++;
+                }
             }
         }
 
+        printf("sum: %d\n", sum);
+
+        struct My_udp_data my_udp_data;
+
+        if (sum > 500) {
+            my_udp_data.obstacle_rate = 1;
+        }
+        else {
+            my_udp_data.obstacle_rate = 0;
+        }
+        sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
+
+
         // Upload the color frame to OpenGL
-        app_state.tex.upload(color);
+        // app_state.tex.upload(color);
 
         // Draw the pointcloud
-        my_draw_pointcloud(app.width(), app.height(), app_state, points);
+        // my_draw_pointcloud(app.width(), app.height(), app_state, points);
     }
 
     return EXIT_SUCCESS;
