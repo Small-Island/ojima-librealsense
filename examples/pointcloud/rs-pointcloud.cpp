@@ -163,7 +163,7 @@ int main(int argc, char * argv[]) try
             }
         }
 
-        printf("sum: %d\n", sum);
+        // printf("sum: %d\n", sum);
 
         struct My_udp_data my_udp_data;
 
