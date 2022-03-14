@@ -980,7 +980,7 @@ void draw_pointcloud(float width, float height, glfw_state& app_state, rs2::poin
     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
     for (int i = 0; i < points.size(); i++)
     {
-        if (vertices[i].z > 0 && vertices[i].y > 0)
+        if (vertices[i].z)
         {
             // upload the point and texture coordinates only for points we have depth data for
             glVertex3fv(vertices[i]);
