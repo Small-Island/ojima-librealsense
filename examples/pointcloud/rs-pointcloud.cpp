@@ -144,7 +144,7 @@ int main(int argc, char * argv[]) try
         auto tex_coords = points.get_texture_coordinates();
 
         int sum = 0;
-        for (int i = 0; i < points.size(); i++)
+        for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
             // {
