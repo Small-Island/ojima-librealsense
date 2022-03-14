@@ -7,7 +7,7 @@
 #include "../concurrency.h"
 
 #include <memory>
-#include <libusb.h>
+#include <libusb-1.0/libusb.h>
 
 namespace librealsense
 {
@@ -16,9 +16,9 @@ namespace librealsense
         class usb_context
         {
         public:
-            usb_context();            
+            usb_context();
             ~usb_context();
-            
+
             libusb_context* get();
 
             void start_event_handler();
