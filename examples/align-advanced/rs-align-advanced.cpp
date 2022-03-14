@@ -64,8 +64,8 @@ int main(int argc, char * argv[]) try
     // Define a variable for controlling the distance to clip
     float depth_clipping_distance = 1.5f;
 
-    // while (app) // Application still alive?
-    while (1)
+    while (app) // Application still alive?
+    // while (1)
     {
         // Using the align object, we block the application until a frameset is available
         rs2::frameset frameset = pipe.wait_for_frames();
@@ -104,33 +104,33 @@ int main(int argc, char * argv[]) try
         printf("%lf\n", my_udp_data.obstacle_rate);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
-        // // Taking dimensions of the window for rendering purposes
-        // float w = static_cast<float>(app.width());
-        // float h = static_cast<float>(app.height());
-        //
-        // // At this point, "other_frame" is an altered frame, stripped form its background
-        // // Calculating the position to place the frame in the window
-        // rect altered_other_frame_rect{ 0, 0, w, h };
-        // altered_other_frame_rect = altered_other_frame_rect.adjust_ratio({ static_cast<float>(other_frame.get_width()),static_cast<float>(other_frame.get_height()) });
-        //
-        // // Render aligned image
-        // renderer.render(other_frame, altered_other_frame_rect);
-        //
-        // // The example also renders the depth frame, as a picture-in-picture
-        // // Calculating the position to place the depth frame in the window
-        // rect pip_stream{ 0, 0, w / 5, h / 5 };
-        // pip_stream = pip_stream.adjust_ratio({ static_cast<float>(aligned_depth_frame.get_width()),static_cast<float>(aligned_depth_frame.get_height()) });
-        // pip_stream.x = altered_other_frame_rect.x + altered_other_frame_rect.w - pip_stream.w - (std::max(w, h) / 25);
-        // pip_stream.y = altered_other_frame_rect.y + (std::max(w, h) / 25);
-        //
-        // // Render depth (as picture in pipcture)
-        // renderer.upload(c.process(aligned_depth_frame));
-        // renderer.show(pip_stream);
-        //
-        // // Using ImGui library to provide a slide controller to select the depth clipping distance
-        // ImGui_ImplGlfw_NewFrame(1);
-        // render_slider({ 5.f, 0, w, h }, depth_clipping_distance);
-        // ImGui::Render();
+        // Taking dimensions of the window for rendering purposes
+        float w = static_cast<float>(app.width());
+        float h = static_cast<float>(app.height());
+
+        // At this point, "other_frame" is an altered frame, stripped form its background
+        // Calculating the position to place the frame in the window
+        rect altered_other_frame_rect{ 0, 0, w, h };
+        altered_other_frame_rect = altered_other_frame_rect.adjust_ratio({ static_cast<float>(other_frame.get_width()),static_cast<float>(other_frame.get_height()) });
+
+        // Render aligned image
+        renderer.render(other_frame, altered_other_frame_rect);
+
+        // The example also renders the depth frame, as a picture-in-picture
+        // Calculating the position to place the depth frame in the window
+        rect pip_stream{ 0, 0, w / 5, h / 5 };
+        pip_stream = pip_stream.adjust_ratio({ static_cast<float>(aligned_depth_frame.get_width()),static_cast<float>(aligned_depth_frame.get_height()) });
+        pip_stream.x = altered_other_frame_rect.x + altered_other_frame_rect.w - pip_stream.w - (std::max(w, h) / 25);
+        pip_stream.y = altered_other_frame_rect.y + (std::max(w, h) / 25);
+
+        // Render depth (as picture in pipcture)
+        renderer.upload(c.process(aligned_depth_frame));
+        renderer.show(pip_stream);
+
+        // Using ImGui library to provide a slide controller to select the depth clipping distance
+        ImGui_ImplGlfw_NewFrame(1);
+        render_slider({ 5.f, 0, w, h }, depth_clipping_distance);
+        ImGui::Render();
 
     }
     return EXIT_SUCCESS;
@@ -209,7 +209,7 @@ double remove_background(rs2::video_frame& other_frame, const rs2::depth_frame& 
     int sum = 0;
 
     #pragma omp parallel for schedule(dynamic) //Using OpenMP to try to parallelise the loop
-    for (int y = height*0.5; y < height; y++)
+    for (int y = 0; y < height; y++)
     {
         auto depth_pixel_index = y * width;
         for (int x = 0; x < width; x++, ++depth_pixel_index)
@@ -232,7 +232,7 @@ double remove_background(rs2::video_frame& other_frame, const rs2::depth_frame& 
         }
     }
 
-    return (double)sum/width/(height*0.5);
+    return (double)sum/width/height;
 }
 
 rs2_stream find_stream_to_align(const std::vector<rs2::stream_profile>& streams)
