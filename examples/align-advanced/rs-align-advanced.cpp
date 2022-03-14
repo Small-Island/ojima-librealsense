@@ -62,7 +62,7 @@ int main(int argc, char * argv[]) try
     rs2::align align(align_to);
 
     // Define a variable for controlling the distance to clip
-    float depth_clipping_distance = 0.5f;
+    float depth_clipping_distance = 1.0f;
 
     // while (app) // Application still alive?
     while (1)
