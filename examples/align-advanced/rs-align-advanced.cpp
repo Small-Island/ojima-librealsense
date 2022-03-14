@@ -232,7 +232,7 @@ double remove_background(rs2::video_frame& other_frame, const rs2::depth_frame& 
         }
     }
 
-    return (double)sum/width/(height*0.8);
+    return (double)sum/width/(height*0.5);
 }
 
 rs2_stream find_stream_to_align(const std::vector<rs2::stream_profile>& streams)
