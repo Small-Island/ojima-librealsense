@@ -58,7 +58,7 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     /* this segment actually prints the pointcloud */
     auto vertices = points.get_vertices();              // get vertices
     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
-    int sum = 0
+    int sum = 0;
     for (int i = 0; i < points.size(); i++)
     {
         // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
