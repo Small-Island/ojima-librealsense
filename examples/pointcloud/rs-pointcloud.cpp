@@ -47,10 +47,9 @@ int main(int argc, char * argv[]) try
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
         auto vertices = points.get_vertices();
-        printf("%d\n", points.size());
         int sum = 0;
         for (int i = 0; i < points.size(); i++) {
-            if (vertices[i].z > 0) {
+            if (vertices[i].y > 0 && vertices[i].z < 1.0) {
                 sum++;
             }
         }
