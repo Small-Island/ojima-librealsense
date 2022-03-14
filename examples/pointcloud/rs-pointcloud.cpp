@@ -56,7 +56,7 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
         //     glVertex3fv(vertices[i]);
         //     glTexCoord2fv(tex_coords[i]);
         // }
-        if (0 < vertices[i].z && -0.5 < vertices[i].x && vertices[i].x < 0.5 && vertices[i].y > 0)
+        if (0 < vertices[i].z && -0.5 < vertices[i].x && vertices[i].x < 0.5 && vertices[i].y < 0.3)
         {
             // upload the point and texture coordinates only for points we have depth data for
             glVertex3fv(vertices[i]);
@@ -117,8 +117,6 @@ int main(int argc, char * argv[]) try
                 sum++;
             }
         }
-        printf("%d, ", tex_coords[0]);
-        printf("%d\n", sum);
 
         // Upload the color frame to OpenGL
         app_state.tex.upload(color);
