@@ -143,7 +143,7 @@ int main(int argc, char * argv[]) try
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
         auto vertices = points.get_vertices();
-        auto tex_coords = points.get_texture_coordinates();
+        // auto tex_coords = points.get_texture_coordinates();
 
         int sum_in_1m = 0, sum_in_2m = 0, sum_in_3m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
