@@ -174,14 +174,14 @@ int main(int argc, char * argv[]) try
 
         struct My_udp_data my_udp_data;
 
-        if (sum_in_1m > 100) {
+        if (sum_in_1m > 50) {
             my_udp_data.obstacle_detected_in_1m = 1;
         }
         else {
             my_udp_data.obstacle_detected_in_1m = 0;
         }
 
-        if (sum_in_2m > 100) {
+        if (sum_in_2m > 50) {
             my_udp_data.obstacle_detected_in_2m = 1;
         }
         else {
