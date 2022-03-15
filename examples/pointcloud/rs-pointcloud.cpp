@@ -15,6 +15,7 @@ struct sockaddr_in addr;
 struct My_udp_data {
     char obstacle_detected_in_1m = 0;
     char obstacle_detected_in_2m = 0;
+    char obstacle_detected_in_3m = 0;
 };
 
 // Helper functions
@@ -144,7 +145,7 @@ int main(int argc, char * argv[]) try
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
 
-        int sum_in_1m = 0, sum_in_2m = 0;
+        int sum_in_1m = 0, sum_in_2m = 0, sum_in_3m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -167,6 +168,9 @@ int main(int argc, char * argv[]) try
                     // glTexCoord2fv(tex_coords[i]);
                     sum_in_2m++;
                 }
+                else if (vertices[i].z < 3.0) {
+                    sum_in_3m++;
+                }
             }
         }
 
@@ -186,6 +190,13 @@ int main(int argc, char * argv[]) try
         }
         else {
             my_udp_data.obstacle_detected_in_2m = 0;
+        }
+
+        if (sum_in_3m > 50) {
+            my_udp_data.obstacle_detected_in_3m = 1;
+        }
+        else {
+            my_udp_data.obstacle_detected_in_3m = 0;
         }
 
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
