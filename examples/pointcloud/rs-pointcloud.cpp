@@ -13,90 +13,91 @@ int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 struct sockaddr_in addr;
 
 struct My_udp_data {
-    double obstacle_rate = 0.0;
+    char obstacle_detected_in_1m = 0;
+    char obstacle_detected_in_2m = 0;
 };
 
 // Helper functions
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
-void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::points& points)
-{
-    if (!points)
-        return;
-
-    // OpenGL commands that prep screen for the pointcloud
-    glLoadIdentity();
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-    glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    gluPerspective(60, width / height, 0.01f, 10.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
-
-    glTranslatef(0, 0, +0.5f + app_state.offset_y * 0.05f);
-    glRotated(app_state.pitch, 1, 0, 0);
-    glRotated(app_state.yaw, 0, 1, 0);
-    glTranslatef(0, 0, -0.5f);
-
-    glPointSize(width / 640);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, app_state.tex.get_gl_handle());
-    float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
-    glBegin(GL_POINTS);
-
-
-    /* this segment actually prints the pointcloud */
-    auto vertices = points.get_vertices();              // get vertices
-    auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
-    int sum = 0;
-    for (int i = 0; i < points.size(); i++)
-    {
-        // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
-        // {
-        //     // upload the point and texture coordinates only for points we have depth data for
-        //     glVertex3fv(vertices[i]);
-        //     glTexCoord2fv(tex_coords[i]);
-        // }
-        if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.55 && vertices[i].z < 1.0)
-        {
-            if (vertices[i].z < 1.0) {
-                // upload the point and texture coordinates only for points we have depth data for
-                glVertex3fv(vertices[i]);
-                glTexCoord2fv(tex_coords[i]);
-                sum++;
-            }
-        }
-    }
-
-    printf("sum: %d\n", sum);
-
-    struct My_udp_data my_udp_data;
-
-    if (sum > 500) {
-        my_udp_data.obstacle_rate = 1;
-    }
-    else {
-        my_udp_data.obstacle_rate = 0;
-    }
-    sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
-
-    // OpenGL cleanup
-    glEnd();
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glPopAttrib();
-}
+// void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::points& points)
+// {
+//     if (!points)
+//         return;
+//
+//     // OpenGL commands that prep screen for the pointcloud
+//     glLoadIdentity();
+//     glPushAttrib(GL_ALL_ATTRIB_BITS);
+//
+//     glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
+//     glClear(GL_DEPTH_BUFFER_BIT);
+//
+//     glMatrixMode(GL_PROJECTION);
+//     glPushMatrix();
+//     gluPerspective(60, width / height, 0.01f, 10.0f);
+//
+//     glMatrixMode(GL_MODELVIEW);
+//     glPushMatrix();
+//     gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
+//
+//     glTranslatef(0, 0, +0.5f + app_state.offset_y * 0.05f);
+//     glRotated(app_state.pitch, 1, 0, 0);
+//     glRotated(app_state.yaw, 0, 1, 0);
+//     glTranslatef(0, 0, -0.5f);
+//
+//     glPointSize(width / 640);
+//     glEnable(GL_DEPTH_TEST);
+//     glEnable(GL_TEXTURE_2D);
+//     glBindTexture(GL_TEXTURE_2D, app_state.tex.get_gl_handle());
+//     float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
+//     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
+//     glBegin(GL_POINTS);
+//
+//
+//     /* this segment actually prints the pointcloud */
+//     auto vertices = points.get_vertices();              // get vertices
+//     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
+//     int sum = 0;
+//     for (int i = 0; i < points.size(); i++)
+//     {
+//         // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
+//         // {
+//         //     // upload the point and texture coordinates only for points we have depth data for
+//         //     glVertex3fv(vertices[i]);
+//         //     glTexCoord2fv(tex_coords[i]);
+//         // }
+//         if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.55 && vertices[i].z < 1.0)
+//         {
+//             if (vertices[i].z < 1.0) {
+//                 // upload the point and texture coordinates only for points we have depth data for
+//                 glVertex3fv(vertices[i]);
+//                 glTexCoord2fv(tex_coords[i]);
+//                 sum++;
+//             }
+//         }
+//     }
+//
+//     printf("sum: %d\n", sum);
+//
+//     struct My_udp_data my_udp_data;
+//
+//     if (sum > 500) {
+//         my_udp_data.obstacle_rate = 1;
+//     }
+//     else {
+//         my_udp_data.obstacle_rate = 0;
+//     }
+//     sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
+//
+//     // OpenGL cleanup
+//     glEnd();
+//     glPopMatrix();
+//     glMatrixMode(GL_PROJECTION);
+//     glPopMatrix();
+//     glPopAttrib();
+// }
 
 int main(int argc, char * argv[]) try
 {
@@ -143,7 +144,7 @@ int main(int argc, char * argv[]) try
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
 
-        int sum = 0;
+        int sum_in_1m = 0, sum_in_2m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -158,7 +159,13 @@ int main(int argc, char * argv[]) try
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
-                    sum++;
+                    sum_in_1m++;
+                }
+                else if (vertices[i].z < 2.0) {
+                    // upload the point and texture coordinates only for points we have depth data for
+                    // glVertex3fv(vertices[i]);
+                    // glTexCoord2fv(tex_coords[i]);
+                    sum_in_2m++;
                 }
             }
         }
@@ -167,12 +174,20 @@ int main(int argc, char * argv[]) try
 
         struct My_udp_data my_udp_data;
 
-        if (sum > 100) {
-            my_udp_data.obstacle_rate = 1;
+        if (sum_in_1m > 100) {
+            my_udp_data.obstacle_detected_in_1m = 1;
         }
         else {
-            my_udp_data.obstacle_rate = 0;
+            my_udp_data.obstacle_detected_in_1m = 0;
         }
+
+        if (sum_in_2m > 100) {
+            my_udp_data.obstacle_detected_in_2m = 1;
+        }
+        else {
+            my_udp_data.obstacle_detected_in_2m = 0;
+        }
+
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
