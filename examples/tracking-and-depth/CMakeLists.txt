@@ -17,4 +17,16 @@ if(BUILD_GRAPHICAL_EXAMPLES)
             COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_CURRENT_SOURCE_DIR}/H_t265_d400.cfg
                     ${CMAKE_CURRENT_BINARY_DIR}/H_t265_d400.cfg)
+
+    add_executable(ojima-tracking-and-depth ojima-tracking-and-depth.cpp ../example.hpp)
+    set_property(TARGET ojima-tracking-and-depth PROPERTY CXX_STANDARD 11)
+    target_link_libraries(ojima-tracking-and-depth ${DEPENDENCIES})
+    include_directories(../)
+    set_target_properties (ojima-tracking-and-depth PROPERTIES FOLDER Examples)
+    install(TARGETS ojima-tracking-and-depth RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    add_custom_command(
+            TARGET ojima-tracking-and-depth POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_CURRENT_SOURCE_DIR}/H_t265_d400.cfg
+                    ${CMAKE_CURRENT_BINARY_DIR}/H_t265_d400.cfg)
 endif()

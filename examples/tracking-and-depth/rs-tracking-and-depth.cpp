@@ -132,15 +132,7 @@ int main(int argc, char * argv[]) try
         if (points && pose_frame) {
             rs2_pose pose =  pose_frame.get_pose_data();
             draw_pointcloud_wrt_world(app.width(), app.height(), app_state, points, pose, H_t265_d400, trajectory);
-            draw_text(0, 0, "cd");
         }
-        glColor3f(1, 1, 1);
-        glLineWidth(2);
-        glBegin(GL_LINE_STRIP);
-        glVertex3f(
-            0, 0, 0
-        );
-        glEnd();
     }
 
     return EXIT_SUCCESS;
