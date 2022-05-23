@@ -13,7 +13,8 @@ int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 struct sockaddr_in addr;
 
 struct My_udp_data {
-    char obstacle_detected_in_1m = 0;
+    char obstacle_detected_in_0_5m = 0;
+    // char obstacle_detected_in_1m = 0;
     char obstacle_detected_in_2m = 0;
     char obstacle_detected_in_3m = 0;
 };
@@ -80,12 +81,12 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     	glVertex3f(0.35, 0, 0.0);
 
         glVertex3f(0.35, 0, 0.0);
-        glVertex3f(0.35, 0, 1.0);
+        glVertex3f(0.35, 0, 0.5);
 
-        glVertex3f(0.35, 0, 1.0);
-        glVertex3f(-0.35, 0, 1.0);
+        glVertex3f(0.35, 0, 0.5);
+        glVertex3f(-0.35, 0, 0.5);
 
-        glVertex3f(-0.35, 0, 1.0);
+        glVertex3f(-0.35, 0, 0.5);
         glVertex3f(-0.35, 0, 0.0);
     glEnd();
     glBegin(GL_LINES);
@@ -152,7 +153,7 @@ int main(int argc, char * argv[]) try
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
 
-        int sum_in_1m = 0, sum_in_2m = 0, sum_in_3m = 0;
+        int sum_in_0_5m = 0, sum_in_2m = 0, sum_in_3m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -163,11 +164,11 @@ int main(int argc, char * argv[]) try
             // }
             if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.55)
             {
-                if (vertices[i].z < 1.0) {
+                if (vertices[i].z < 0.5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
-                    sum_in_1m++;
+                    sum_in_0_5m++;
                 }
                 else if (vertices[i].z < 2.0) {
                     // upload the point and texture coordinates only for points we have depth data for
@@ -185,11 +186,11 @@ int main(int argc, char * argv[]) try
 
         struct My_udp_data my_udp_data;
 
-        if (sum_in_1m > 50) {
-            my_udp_data.obstacle_detected_in_1m = 1;
+        if (sum_in_0_5m > 50) {
+            my_udp_data.obstacle_detected_in_0_5m = 1;
         }
         else {
-            my_udp_data.obstacle_detected_in_1m = 0;
+            my_udp_data.obstacle_detected_in_0_5m = 0;
         }
 
         if (sum_in_2m > 50) {
@@ -205,7 +206,7 @@ int main(int argc, char * argv[]) try
         else {
             my_udp_data.obstacle_detected_in_3m = 0;
         }
-        printf("1m %d, 2m %d, 3m %d\n", my_udp_data.obstacle_detected_in_1m, my_udp_data.obstacle_detected_in_2m, my_udp_data.obstacle_detected_in_3m);
+        printf("1m %d, 2m %d, 3m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_2m, my_udp_data.obstacle_detected_in_3m);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
