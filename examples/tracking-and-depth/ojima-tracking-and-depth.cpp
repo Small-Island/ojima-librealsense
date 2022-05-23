@@ -37,7 +37,8 @@ struct vec4 beta_multi_4x4_and_4x1(float H[16], struct vec4 vec0) {
     return vec;
 }
 
-int map[100][100] = {{0}};
+
+int map[201][201] = {{0}};
 
 void my_draw_pointcloud_wrt_world(float width, float height, glfw_state& app_state, rs2::points& points, rs2_pose& pose, float H_t265_d400[16], std::vector<rs2_vector>& trajectory)
 {
@@ -128,21 +129,21 @@ void my_draw_pointcloud_wrt_world(float width, float height, glfw_state& app_sta
 
         glColor3f(0.0, 0.0, 1.0);
         glVertex3f(p0.x, p0.y, p0.z);
-        struct vec4 p3 = {0, 0, 1.0, 1};
+        struct vec4 p3 = {0, 0, sqrt(0.5), 1};
         p3 = multi_4x4_and_4x1(H_t265_d400, p3);
         p3 = multi_4x4_and_4x1(H_world_t265, p3);
         // p3 = multi_4x4_and_4x1(H_t265_d400, p3);
         glVertex3f(p3.x, p3.y, p3.z);
 
         glVertex3f(p0.x, p0.y, p0.z);
-        struct vec4 p4 = {2*std::sin(PI/4.0), 0, 2*std::cos(PI/4.0), 1};
+        struct vec4 p4 = {1.0*std::sin(PI/4.0), 0, 1.0*std::cos(PI/4.0), 1};
         p4 = multi_4x4_and_4x1(H_t265_d400, p4);
         p4 = multi_4x4_and_4x1(H_world_t265, p4);
         // p3 = multi_4x4_and_4x1(H_t265_d400, p3);
         glVertex3f(p4.x, p4.y, p4.z);
 
         glVertex3f(p0.x, p0.y, p0.z);
-        struct vec4 p5 = {2*std::sin(-PI/4.0), 0, 2*std::cos(-PI/4.0), 1};
+        struct vec4 p5 = {1.0*std::sin(-PI/4.0), 0, 1.0*std::cos(-PI/4.0), 1};
         p5 = multi_4x4_and_4x1(H_t265_d400, p5);
         p5 = multi_4x4_and_4x1(H_world_t265, p5);
         // p3 = multi_4x4_and_4x1(H_t265_d400, p3);
@@ -151,18 +152,18 @@ void my_draw_pointcloud_wrt_world(float width, float height, glfw_state& app_sta
     glColor3f(1.0f, 1.0f, 1.0f);
 
     double a1 = p4.x - p0.x;
-    double a2 = p4.y - p0.y;
+    double a2 = p4.z - p0.z;
 
     double b1 = p5.x - p0.x;
-    double b2 = p5.y - p0.y;
+    double b2 = p5.z - p0.z;
 
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 100; j++) {
-            double s = b2 * (i/10.0 - 5 - p0.x) - b1 * (j/10.0 - 5 - p0.y) ;
+    for (int i = 0; i < 201; i++) {
+        for (int j = 0; j < 201; j++) {
+            double s = b2 * ((double)i/20.0 - 5.0 - p0.x) - b1 * ((double)j/20.0 - 5.0 - p0.y) ;
             s /= a1 * b2 - b1 * a2;
-            double t = -a2 * (i/10.0 - 5 - p0.x) + a1 * (j/10.0 - 5 - p0.y);
+            double t = -a2 * ((double)i/20.0 - 5.0 - p0.x) + a1 * ((double)j/20.0 - 5.0 - p0.y);
             t /= a1 * b2 - b1 * a2;
-            if (s > 0.05 && s < 2 && t > 0.05 && t < 2) {
+            if (s > 0.05 && s < 0.95 && t > 0.05 && t < 0.95) {
                 map[i][j] = 0;
             }
         }
@@ -171,40 +172,40 @@ void my_draw_pointcloud_wrt_world(float width, float height, glfw_state& app_sta
     auto vertices = points.get_vertices();
     for (int i = 0; i < points.size(); i += 50)
     {
-        if (0 < vertices[i].z)
+        if (0.3 < vertices[i].z)
         {
             // upload the point and texture coordinates only for points we have depth data for
             struct vec4 p = {vertices[i].x, vertices[i].y, vertices[i].z, 1};
             p = multi_4x4_and_4x1(H_t265_d400, p);
             p = multi_4x4_and_4x1(H_world_t265, p);
 
-            if (p.y > 0 && p.y < 0.5) {
-                if ((int)(p.x * 10) >= -50 && (int)(p.x * 10) < 50 && (int)(p.z * 10) >= -50 && (int)(p.z * 10) < 50) {
-                    map[(int)(p.x * 10) + 50][(int)(p.z * 10) + 50]++;
+            if (p.y > -0.3 && p.y < 0.3) {
+                if (p.x >= -5.0 && p.x <= 5.0 && p.z >= -5.0 && p.z <= 5.0) {
+                    map[(int)round(p.x * 20) + 100][(int)round(p.z * 20) + 100]++;
                 }
             }
         }
     }
 
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 100; j++) {
-            if (map[i][j] > 100) {
+    for (int i = 0; i < 201; i++) {
+        for (int j = 0; j < 201; j++) {
+            if (map[i][j] > 10) {
                 glBegin(GL_LINE_LOOP);
                     glLineWidth(2.0f);
                     glColor3f(0.0f, 1.0f, 1.0f);
-                    glVertex3f(i/10.0 - 5 - 0.05, 0, j/10.0 - 5 - 0.05);
-                    glVertex3f(i/10.0 - 5 - 0.05, 0, j/10.0 - 5 + 0.05);
-                    glVertex3f(i/10.0 - 5 + 0.05, 0, j/10.0 - 5 + 0.05);
-                    glVertex3f(i/10.0 - 5 + 0.05, 0, j/10.0 - 5 - 0.05);
+                    glVertex3f(i/20.0 - 5 - 0.025, 0, j/20.0 - 5 - 0.025);
+                    glVertex3f(i/20.0 - 5 - 0.025, 0, j/20.0 - 5 + 0.025);
+                    glVertex3f(i/20.0 - 5 + 0.025, 0, j/20.0 - 5 + 0.025);
+                    glVertex3f(i/20.0 - 5 + 0.025, 0, j/20.0 - 5 - 0.025);
                 glEnd();
             }
         }
     }
 
-    // glMultMatrixf(H_world_t265);
-    // //
-    // // // T265 to D4xx extrinsics
-    // glMultMatrixf(H_t265_d400);
+    glMultMatrixf(H_world_t265);
+
+    // T265 to D4xx extrinsics
+    glMultMatrixf(H_t265_d400);
 
 
     glPointSize(width / 640);
@@ -222,17 +223,17 @@ void my_draw_pointcloud_wrt_world(float width, float height, glfw_state& app_sta
     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
     for (int i = 0; i < points.size(); i++)
     {
-        if (0 < vertices[i].z)
+        if (0.3 < vertices[i].z)
         {
             // upload the point and texture coordinates only for points we have depth data for
-            struct vec4 p = {vertices[i].x, vertices[i].y, vertices[i].z, 1};
-            p = multi_4x4_and_4x1(H_t265_d400, p);
-            p = multi_4x4_and_4x1(H_world_t265, p);
+            // struct vec4 p = {vertices[i].x, vertices[i].y, vertices[i].z, 1};
+            // p = multi_4x4_and_4x1(H_t265_d400, p);
+            // p = multi_4x4_and_4x1(H_world_t265, p);
 
-            // glVertex3fv(vertices[i]);
+            glVertex3fv(vertices[i]);
             glColor3f(1.0f, 1.0f, 1.0f);
-            glPointSize(width / 640);
-            glVertex3f(p.x, p.y, p.z);
+            // glPointSize(width / 640);
+            // glVertex3f(p.x, p.y, p.z);
             glTexCoord2fv(tex_coords[i]);
         }
     }
