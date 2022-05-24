@@ -102,6 +102,32 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
         glVertex3f(-0.35, 0, 2.0);
         glVertex3f(-0.35, 0, 0.0);
     glEnd();
+    glBegin(GL_LINES);
+        glVertex3f(-0.35, 0.5, 0.0);
+    	glVertex3f(0.35, 0.5, 0.0);
+
+        glVertex3f(0.35, 0.5, 0.0);
+        glVertex3f(0.35, 0.5, 0.5);
+
+        glVertex3f(0.35, 0.5, 0.5);
+        glVertex3f(-0.35, 0.5, 0.5);
+
+        glVertex3f(-0.35, 0.5, 0.5);
+        glVertex3f(-0.35, 0.5, 0.0);
+    glEnd();
+    glBegin(GL_LINES);
+        glVertex3f(-0.35, 0.5, 0.0);
+    	glVertex3f(0.35, 0.5, 0.0);
+
+        glVertex3f(0.35, 0.5, 0.0);
+        glVertex3f(0.35, 0.5, 2.0);
+
+        glVertex3f(0.35, 0.5, 2.0);
+        glVertex3f(-0.35, 0.5, 2.0);
+
+        glVertex3f(-0.35, 0.5, 2.0);
+        glVertex3f(-0.35, 0.5, 0.0);
+    glEnd();
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
