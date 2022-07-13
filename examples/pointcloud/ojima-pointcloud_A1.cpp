@@ -165,7 +165,7 @@ int main(int argc, char * argv[]) try
             my_udp_data.obstacle_detected_in_1_0m = 0;
         }
 
-        // printf("1m %d, 2m %d, 3m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_2m, my_udp_data.obstacle_detected_in_3m);
+        printf("0.5m %d, 1.0m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_1_0m);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
