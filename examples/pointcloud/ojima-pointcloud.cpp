@@ -130,7 +130,7 @@ int main(int argc, char * argv[]) try
             //     glVertex3fv(vertices[i]);
             //     glTexCoord2fv(tex_coords[i]);
             // }
-            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 1.0 && vertices[i].y > -0.5)
+            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.8 && vertices[i].y > -0.5)
             {
                 if (vertices[i].z < 0.5) {
                     // upload the point and texture coordinates only for points we have depth data for
