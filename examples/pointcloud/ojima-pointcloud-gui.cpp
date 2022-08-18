@@ -87,65 +87,24 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
         glVertex3f(xl, yl, z_0_5);
     glEnd();
     glBegin(GL_LINES);
-        glVertex3f(-0.35, 0.3, 0.0);
-    	glVertex3f(0.35, 0.3, 0.0);
-
-        glVertex3f(0.35, 0.3, 0.0);
-        glVertex3f(0.35, 0.3, 2.0);
-
-        glVertex3f(0.35, 0.3, 2.0);
-        glVertex3f(-0.35, 0.3, 2.0);
-
-        glVertex3f(-0.35, 0.3, 2.0);
-        glVertex3f(-0.35, 0.3, 0.0);
+        glVertex3f(xl, yl, 0.0);
+        glVertex3f(xl, yu, 0.0);
+        glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yl, z_0_5);
+        glVertex3f(xu, yu, z_0_5);
+        glVertex3f(xl, yl, z_0_5);
+        glVertex3f(xl, yu, z_0_5);
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yu, 0.0);
+    	glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yu, z_0_5);
+        glVertex3f(xl, yu, z_0_5);
     glEnd();
 
-    glBegin(GL_LINES);
-        glVertex3f(-0.35, -0.5, 0.0);
-    	glVertex3f(0.35, -0.5, 0.0);
 
-        glVertex3f(0.35, -0.5, 0.0);
-        glVertex3f(0.35, -0.5, 0.5);
 
-        glVertex3f(0.35, -0.5, 0.5);
-        glVertex3f(-0.35, -0.5, 0.5);
-
-        glVertex3f(-0.35, -0.5, 0.5);
-        glVertex3f(-0.35, -0.5, 0.0);
-    glEnd();
-    glBegin(GL_LINES);
-        glVertex3f(-0.35, -0.5, 0.0);
-    	glVertex3f(0.35, -0.5, 0.0);
-
-        glVertex3f(0.35, -0.5, 0.0);
-        glVertex3f(0.35, -0.5, 2.0);
-
-        glVertex3f(0.35, -0.5, 2.0);
-        glVertex3f(-0.35, -0.5, 2.0);
-
-        glVertex3f(-0.35, -0.5, 2.0);
-        glVertex3f(-0.35, -0.5, 0.0);
-    glEnd();
-
-    glBegin(GL_LINES);
-        glVertex3f(-0.35, 0.3, 0.0);
-    	glVertex3f(-0.35, -0.5, 0.0);
-
-        glVertex3f(0.35, 0.3, 0.0);
-        glVertex3f(0.35, -0.5, 0.0);
-
-        glVertex3f(-0.35, 0.3, 0.5);
-        glVertex3f(-0.35, -0.5, 0.5);
-
-        glVertex3f(0.35, 0.3, 0.5);
-        glVertex3f(0.35, -0.5, 0.5);
-
-        glVertex3f(-0.35, 0.3, 2.0);
-        glVertex3f(-0.35, -0.5, 2.0);
-
-        glVertex3f(0.35, 0.3, 2.0);
-        glVertex3f(0.35, -0.5, 2.0);
-    glEnd();
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
