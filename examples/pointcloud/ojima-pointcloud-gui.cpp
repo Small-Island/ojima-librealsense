@@ -68,10 +68,16 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
 
     for (int i = 0; i < points.size(); i++)
     {
-        if (vertices[i].z > 0) {
-            // upload the point and texture coordinates only for points we have depth data for
-            glVertex3fv(vertices[i]);
-            glTexCoord2fv(tex_coords[i]);
+        if (0 < vertices[i].z && xl < vertices[i].x && vertices[i].x < xu && vertices[i].y < yl && vertices[i].y > yu)
+        {
+            if (vertices[i].z < z_0_5) {
+                glVertex3fv(vertices[i]);
+                glTexCoord2fv(tex_coords[i]);
+            }
+            else if (vertices[i].z < z_1_5) {
+                glVertex3fv(vertices[i]);
+                glTexCoord2fv(tex_coords[i]);
+            }
         }
     }
     // OpenGL cleanup
@@ -101,6 +107,29 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     	glVertex3f(xu, yu, 0.0);
         glVertex3f(xu, yu, z_0_5);
         glVertex3f(xl, yu, z_0_5);
+    glEnd();
+
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yl, 0.0);
+    	glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yl, z_1_5);
+        glVertex3f(xl, yl, z_1_5);
+    glEnd();
+    glBegin(GL_LINES);
+        glVertex3f(xl, yl, 0.0);
+        glVertex3f(xl, yu, 0.0);
+        glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yl, z_1_5);
+        glVertex3f(xu, yu, z_1_5);
+        glVertex3f(xl, yl, z_1_5);
+        glVertex3f(xl, yu, z_1_5);
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yu, 0.0);
+    	glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yu, z_1_5);
+        glVertex3f(xl, yu, z_1_5);
     glEnd();
 
 
@@ -166,15 +195,15 @@ int main(int argc, char * argv[]) try
             //     glVertex3fv(vertices[i]);
             //     glTexCoord2fv(tex_coords[i]);
             // }
-            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.25 && vertices[i].y > -0.5)
+            if (0 < vertices[i].z && xl < vertices[i].x && vertices[i].x < xu && vertices[i].y < yl && vertices[i].y > yu)
             {
-                if (vertices[i].z < 0.5) {
+                if (vertices[i].z < z_0_5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
                     sum_in_0_5m++;
                 }
-                else if (vertices[i].z < 1.5) {
+                else if (vertices[i].z < z_1_5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
