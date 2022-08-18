@@ -15,7 +15,7 @@ struct sockaddr_in addr;
 struct My_udp_data {
     char obstacle_detected_in_0_5m = 0;
     // char obstacle_detected_in_1m = 0;
-    char obstacle_detected_in_2m = 0;
+    char obstacle_detected_in_1_5m = 0;
     char obstacle_detected_in_3m = 0;
 };
 
@@ -201,7 +201,7 @@ int main(int argc, char * argv[]) try
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
 
-        int sum_in_0_5m = 0, sum_in_2m = 0, sum_in_3m = 0;
+        int sum_in_0_5m = 0, sum_in_1_5m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -210,7 +210,7 @@ int main(int argc, char * argv[]) try
             //     glVertex3fv(vertices[i]);
             //     glTexCoord2fv(tex_coords[i]);
             // }
-            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.3 && vertices[i].y > -0.5)
+            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.25 && vertices[i].y > -0.5)
             {
                 if (vertices[i].z < 0.5) {
                     // upload the point and texture coordinates only for points we have depth data for
@@ -218,14 +218,11 @@ int main(int argc, char * argv[]) try
                     // glTexCoord2fv(tex_coords[i]);
                     sum_in_0_5m++;
                 }
-                else if (vertices[i].z < 2.0) {
+                else if (vertices[i].z < 1.5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
-                    sum_in_2m++;
-                }
-                else if (vertices[i].z < 3.0) {
-                    sum_in_3m++;
+                    sum_in_1_5m++;
                 }
             }
         }
@@ -241,20 +238,14 @@ int main(int argc, char * argv[]) try
             my_udp_data.obstacle_detected_in_0_5m = 0;
         }
 
-        if (sum_in_2m > 50) {
-            my_udp_data.obstacle_detected_in_2m = 1;
+        if (sum_in_1_5m > 50) {
+            my_udp_data.obstacle_detected_in_1_5m = 1;
         }
         else {
-            my_udp_data.obstacle_detected_in_2m = 0;
+            my_udp_data.obstacle_detected_in_1_5m = 0;
         }
 
-        if (sum_in_3m > 50) {
-            my_udp_data.obstacle_detected_in_3m = 1;
-        }
-        else {
-            my_udp_data.obstacle_detected_in_3m = 0;
-        }
-        printf("0.5m %d, 2m %d, 3m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_2m, my_udp_data.obstacle_detected_in_3m);
+        printf("0.5m %d, 1.5m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_1_5m);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
