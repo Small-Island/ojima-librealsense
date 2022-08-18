@@ -9,6 +9,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+double xl = -0.35, xu = 0.35;
+double yl = 0.25, yu = -0.5;
+double z_0_5 = 0.5, z_1_5 = 1.5;
+
 int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 struct sockaddr_in addr;
 
@@ -76,18 +80,11 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     glPointSize(10);
     glLineWidth(4.5);
     glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINES);
-        glVertex3f(-0.35, 0.3, 0.0);
-    	glVertex3f(0.35, 0.3, 0.0);
-
-        glVertex3f(0.35, 0.3, 0.0);
-        glVertex3f(0.35, 0.3, 0.5);
-
-        glVertex3f(0.35, 0.3, 0.5);
-        glVertex3f(-0.35, 0.3, 0.5);
-
-        glVertex3f(-0.35, 0.3, 0.5);
-        glVertex3f(-0.35, 0.3, 0.0);
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yl, 0.0);
+    	glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yl, z_0_5);
+        glVertex3f(xl, yl, z_0_5);
     glEnd();
     glBegin(GL_LINES);
         glVertex3f(-0.35, 0.3, 0.0);
