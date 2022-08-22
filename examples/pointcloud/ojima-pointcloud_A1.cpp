@@ -11,14 +11,14 @@
 
 double xl = -0.15, xu = 0.15;
 double yl = 0.2, yu = -1.0;
-double z_0_5 = 0.5, z_1 = 1.0;
+double z_0_5 = 0.5, z_1_0 = 1.0;
 
 int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 struct sockaddr_in addr;
 
 struct My_udp_data {
     char obstacle_detected_in_0_5m = 0;
-    char obstacle_detected_in_1m = 0;
+    char obstacle_detected_in_1_0m = 0;
     char obstacle_detected_in_1_5m = 0;
 };
 
@@ -73,7 +73,7 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
                 glVertex3fv(vertices[i]);
                 glTexCoord2fv(tex_coords[i]);
             }
-            else if (vertices[i].z < z_1) {
+            else if (vertices[i].z < z_1_0) {
                 glVertex3fv(vertices[i]);
                 glTexCoord2fv(tex_coords[i]);
             }
@@ -111,24 +111,24 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
     glBegin(GL_LINE_LOOP);
         glVertex3f(xl, yl, 0.0);
     	glVertex3f(xu, yl, 0.0);
-        glVertex3f(xu, yl, z_1);
-        glVertex3f(xl, yl, z_1);
+        glVertex3f(xu, yl, z_1_0);
+        glVertex3f(xl, yl, z_1_0);
     glEnd();
     glBegin(GL_LINES);
         glVertex3f(xl, yl, 0.0);
         glVertex3f(xl, yu, 0.0);
         glVertex3f(xu, yl, 0.0);
         glVertex3f(xu, yu, 0.0);
-        glVertex3f(xu, yl, z_1);
-        glVertex3f(xu, yu, z_1);
-        glVertex3f(xl, yl, z_1);
-        glVertex3f(xl, yu, z_1);
+        glVertex3f(xu, yl, z_1_0);
+        glVertex3f(xu, yu, z_1_0);
+        glVertex3f(xl, yl, z_1_0);
+        glVertex3f(xl, yu, z_1_0);
     glEnd();
     glBegin(GL_LINE_LOOP);
         glVertex3f(xl, yu, 0.0);
     	glVertex3f(xu, yu, 0.0);
-        glVertex3f(xu, yu, z_1);
-        glVertex3f(xl, yu, z_1);
+        glVertex3f(xu, yu, z_1_0);
+        glVertex3f(xl, yu, z_1_0);
     glEnd();
 
 
@@ -185,7 +185,7 @@ int main(int argc, char * argv[]) try
         auto vertices = points.get_vertices();
         auto tex_coords = points.get_texture_coordinates();
 
-        int sum_in_0_5m = 0, sum_in_1m = 0;
+        int sum_in_0_5m = 0, sum_in_1_0m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
         {
             // if (0 < vertices[i].z && vertices[i].z < 1.0 && vertices[i].y < 0)
@@ -202,11 +202,11 @@ int main(int argc, char * argv[]) try
                     // glTexCoord2fv(tex_coords[i]);
                     sum_in_0_5m++;
                 }
-                else if (vertices[i].z < z_1) {
+                else if (vertices[i].z < z_1_0) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
-                    sum_in_1m++;
+                    sum_in_1_0m++;
                 }
             }
         }
@@ -222,14 +222,14 @@ int main(int argc, char * argv[]) try
             my_udp_data.obstacle_detected_in_0_5m = 0;
         }
 
-        if (sum_in_1m > 50) {
-            my_udp_data.obstacle_detected_in_1m = 1;
+        if (sum_in_1_0m > 50) {
+            my_udp_data.obstacle_detected_in_1_0m = 1;
         }
         else {
-            my_udp_data.obstacle_detected_in_1m = 0;
+            my_udp_data.obstacle_detected_in_1_0m = 0;
         }
 
-        printf("0.5m %d, 1.5m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_1m);
+        printf("0.5m %d, 1.5m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_1_0m);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
