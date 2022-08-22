@@ -18,9 +18,8 @@ struct sockaddr_in addr;
 
 struct My_udp_data {
     char obstacle_detected_in_0_5m = 0;
-    // char obstacle_detected_in_1m = 0;
+    char obstacle_detected_in_1m = 0;
     char obstacle_detected_in_1_5m = 0;
-    char obstacle_detected_in_3m = 0;
 };
 
 // Helper functions

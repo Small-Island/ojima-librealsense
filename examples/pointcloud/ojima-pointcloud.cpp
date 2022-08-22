@@ -9,72 +9,136 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+double xl = -0.35, xu = 0.35;
+double yl = 0.25, yu = -0.5;
+double z_0_5 = 0.5, z_1_5 = 1.5;
+
 int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 struct sockaddr_in addr;
 
 struct My_udp_data {
     char obstacle_detected_in_0_5m = 0;
+    char obstacle_detected_in_1m = 0;
     char obstacle_detected_in_1_5m = 0;
 };
 
 // Helper functions
 void register_glfw_callbacks(window& app, glfw_state& app_state);
 
-// void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::points& points)
-// {
-//     if (!points)
-//         return;
-//
-//     // OpenGL commands that prep screen for the pointcloud
-//     glLoadIdentity();
-//     glPushAttrib(GL_ALL_ATTRIB_BITS);
-//
-//     glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
-//     glClear(GL_DEPTH_BUFFER_BIT);
-//
-//     glMatrixMode(GL_PROJECTION);
-//     glPushMatrix();
-//     gluPerspective(60, width / height, 0.01f, 10.0f);
-//
-//     glMatrixMode(GL_MODELVIEW);
-//     glPushMatrix();
-//     gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
-//
-//     glTranslatef(0, 0, +0.5f + app_state.offset_y * 0.05f);
-//     glRotated(app_state.pitch, 1, 0, 0);
-//     glRotated(app_state.yaw, 0, 1, 0);
-//     glTranslatef(0, 0, -0.5f);
-//
-//     glPointSize(width / 640);
-//     glEnable(GL_DEPTH_TEST);
-//     glEnable(GL_TEXTURE_2D);
-//     glBindTexture(GL_TEXTURE_2D, app_state.tex.get_gl_handle());
-//     float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
-//     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
-//     glBegin(GL_POINTS);
-//
-//
-//     /* this segment actually prints the pointcloud */
-//     auto vertices = points.get_vertices();              // get vertices
-//     auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
-//
-//     for (int i = 0; i < points.size(); i++)
-//     {
-//         if (vertices[i].z > 0) {
-//             // upload the point and texture coordinates only for points we have depth data for
-//             glVertex3fv(vertices[i]);
-//             glTexCoord2fv(tex_coords[i]);
-//         }
-//     }
-//     // OpenGL cleanup
-//     glEnd();
-//     glPopMatrix();
-//     glMatrixMode(GL_PROJECTION);
-//     glPopMatrix();
-//     glPopAttrib();
-// }
+void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::points& points)
+{
+    if (!points)
+        return;
+
+    // OpenGL commands that prep screen for the pointcloud
+    glLoadIdentity();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    gluPerspective(60, width / height, 0.01f, 10.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
+
+    glTranslatef(0, 0, +0.5f + app_state.offset_y * 0.05f);
+    glRotated(app_state.pitch, 1, 0, 0);
+    glRotated(app_state.yaw, 0, 1, 0);
+    glTranslatef(0, 0, -0.5f);
+
+    glPointSize(width / 640);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, app_state.tex.get_gl_handle());
+    float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
+    glBegin(GL_POINTS);
+
+
+    /* this segment actually prints the pointcloud */
+    auto vertices = points.get_vertices();              // get vertices
+    auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
+
+    for (int i = 0; i < points.size(); i++)
+    {
+        if (0 < vertices[i].z && xl < vertices[i].x && vertices[i].x < xu && vertices[i].y < yl && vertices[i].y > yu)
+        {
+            if (vertices[i].z < z_0_5) {
+                glVertex3fv(vertices[i]);
+                glTexCoord2fv(tex_coords[i]);
+            }
+            else if (vertices[i].z < z_1_5) {
+                glVertex3fv(vertices[i]);
+                glTexCoord2fv(tex_coords[i]);
+            }
+        }
+    }
+    // OpenGL cleanup
+    glEnd();
+
+    glPointSize(10);
+    glLineWidth(4.5);
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yl, 0.0);
+    	glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yl, z_0_5);
+        glVertex3f(xl, yl, z_0_5);
+    glEnd();
+    glBegin(GL_LINES);
+        glVertex3f(xl, yl, 0.0);
+        glVertex3f(xl, yu, 0.0);
+        glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yl, z_0_5);
+        glVertex3f(xu, yu, z_0_5);
+        glVertex3f(xl, yl, z_0_5);
+        glVertex3f(xl, yu, z_0_5);
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yu, 0.0);
+    	glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yu, z_0_5);
+        glVertex3f(xl, yu, z_0_5);
+    glEnd();
+
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yl, 0.0);
+    	glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yl, z_1_5);
+        glVertex3f(xl, yl, z_1_5);
+    glEnd();
+    glBegin(GL_LINES);
+        glVertex3f(xl, yl, 0.0);
+        glVertex3f(xl, yu, 0.0);
+        glVertex3f(xu, yl, 0.0);
+        glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yl, z_1_5);
+        glVertex3f(xu, yu, z_1_5);
+        glVertex3f(xl, yl, z_1_5);
+        glVertex3f(xl, yu, z_1_5);
+    glEnd();
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(xl, yu, 0.0);
+    	glVertex3f(xu, yu, 0.0);
+        glVertex3f(xu, yu, z_1_5);
+        glVertex3f(xl, yu, z_1_5);
+    glEnd();
+
+
+
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glPopAttrib();
+}
 
 int main(int argc, char * argv[]) try
 {
@@ -83,11 +147,11 @@ int main(int argc, char * argv[]) try
     addr.sin_port = htons(4001);
 
     // Create a simple OpenGL window for rendering:
-    // window app(1280, 720, "RealSense Pointcloud Example");
+    window app(1280, 720, "RealSense Pointcloud Example");
     // Construct an object to manage view state
-    // glfw_state app_state;
+    glfw_state app_state;
     // register callbacks to allow manipulation of the pointcloud
-    // register_glfw_callbacks(app, app_state);
+    register_glfw_callbacks(app, app_state);
 
     // Declare pointcloud object, for calculating pointclouds and texture mappings
     rs2::pointcloud pc;
@@ -99,27 +163,27 @@ int main(int argc, char * argv[]) try
     // Start streaming with default recommended configuration
     pipe.start();
 
-    // while (app) // Application still alive?
-    while (1)
+    while (app) // Application still alive?
+    // while (1)
     {
         // Wait for the next set of frames from the camera
         auto frames = pipe.wait_for_frames();
 
-        // auto color = frames.get_color_frame();
+        auto color = frames.get_color_frame();
 
         // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
-        // if (!color)
-        //     color = frames.get_infrared_frame();
+        if (!color)
+            color = frames.get_infrared_frame();
 
         // Tell pointcloud object to map to this color frame
-        // pc.map_to(color);
+        pc.map_to(color);
 
         auto depth = frames.get_depth_frame();
 
         // Generate the pointcloud and texture mappings
         points = pc.calculate(depth);
         auto vertices = points.get_vertices();
-        // auto tex_coords = points.get_texture_coordinates();
+        auto tex_coords = points.get_texture_coordinates();
 
         int sum_in_0_5m = 0, sum_in_1_5m = 0;
         for (int i = 0; i < points.size(); i = i + 100)
@@ -130,15 +194,15 @@ int main(int argc, char * argv[]) try
             //     glVertex3fv(vertices[i]);
             //     glTexCoord2fv(tex_coords[i]);
             // }
-            if (0 < vertices[i].z && -0.35 < vertices[i].x && vertices[i].x < 0.35 && vertices[i].y < 0.25 && vertices[i].y > -0.5)
+            if (0 < vertices[i].z && xl < vertices[i].x && vertices[i].x < xu && vertices[i].y < yl && vertices[i].y > yu)
             {
-                if (vertices[i].z < 0.5) {
+                if (vertices[i].z < z_0_5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
                     sum_in_0_5m++;
                 }
-                else if (vertices[i].z < 1.5) {
+                else if (vertices[i].z < z_1_5) {
                     // upload the point and texture coordinates only for points we have depth data for
                     // glVertex3fv(vertices[i]);
                     // glTexCoord2fv(tex_coords[i]);
@@ -165,12 +229,12 @@ int main(int argc, char * argv[]) try
             my_udp_data.obstacle_detected_in_1_5m = 0;
         }
 
-        // printf("1m %d, 2m %d, 3m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_2m, my_udp_data.obstacle_detected_in_3m);
+        printf("0.5m %d, 1.5m %d\n", my_udp_data.obstacle_detected_in_0_5m, my_udp_data.obstacle_detected_in_1_5m);
         sendto(sockfd, &my_udp_data, sizeof(struct My_udp_data), 0, (struct sockaddr *)&addr, sizeof(addr));
 
 
         // Upload the color frame to OpenGL
-        // app_state.tex.upload(color);
+        app_state.tex.upload(color);
 
         // Draw the pointcloud
         // my_draw_pointcloud(app.width(), app.height(), app_state, points);
