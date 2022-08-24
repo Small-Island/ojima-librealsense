@@ -147,11 +147,11 @@ int main(int argc, char * argv[]) try
     addr.sin_port = htons(4001);
 
     // Create a simple OpenGL window for rendering:
-    window app(1280, 720, "RealSense Pointcloud Example");
+    // window app(1280, 720, "RealSense Pointcloud Example");
     // Construct an object to manage view state
-    glfw_state app_state;
+    // glfw_state app_state;
     // register callbacks to allow manipulation of the pointcloud
-    register_glfw_callbacks(app, app_state);
+    // register_glfw_callbacks(app, app_state);
 
     // Declare pointcloud object, for calculating pointclouds and texture mappings
     rs2::pointcloud pc;
@@ -163,8 +163,8 @@ int main(int argc, char * argv[]) try
     // Start streaming with default recommended configuration
     pipe.start();
 
-    while (app) // Application still alive?
-    // while (1)
+    // while (app) // Application still alive?
+    while (1)
     {
         // Wait for the next set of frames from the camera
         auto frames = pipe.wait_for_frames();
@@ -234,7 +234,7 @@ int main(int argc, char * argv[]) try
 
 
         // Upload the color frame to OpenGL
-        app_state.tex.upload(color);
+        // app_state.tex.upload(color);
 
         // Draw the pointcloud
         // my_draw_pointcloud(app.width(), app.height(), app_state, points);
