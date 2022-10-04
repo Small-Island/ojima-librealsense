@@ -143,8 +143,8 @@ void my_draw_pointcloud(float width, float height, glfw_state& app_state, rs2::p
 int main(int argc, char * argv[]) try
 {
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    addr.sin_port = htons(4001);
+    addr.sin_addr.s_addr = inet_addr("192.168.123.161");
+    addr.sin_port = htons(4003);
 
     // Create a simple OpenGL window for rendering:
     // window app(1280, 720, "RealSense Pointcloud Example");
